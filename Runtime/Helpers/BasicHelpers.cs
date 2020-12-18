@@ -36,6 +36,17 @@ namespace HPTK.Helpers
             return newObj;
         }
 
+        public static GameObject InstantiateEmptyChild(GameObject parent, string name)
+        {
+            GameObject newObj = new GameObject();
+            newObj.transform.parent = parent.transform;
+            newObj.transform.localPosition = Vector3.zero;
+            newObj.transform.localRotation = Quaternion.identity;
+            newObj.transform.name = name;
+
+            return newObj;
+        }
+
         public static Vector3 FurthestPoint(Vector3 from, Vector3[] points)
         {
             Vector3 furthestPoint = from;
@@ -72,6 +83,83 @@ namespace HPTK.Helpers
             }
 
             return closestPoint;
+        }
+
+        public static Quaternion[] GetRotations(Transform[] transforms, Space space)
+        {
+            List<Quaternion> rotations = new List<Quaternion>();
+
+            for (int i = 0; i < transforms.Length; i++)
+            {
+                if (space == Space.World)
+                    rotations.Add(transforms[i].rotation);
+                else
+                    rotations.Add(transforms[i].localRotation);
+            }
+
+            return rotations.ToArray();
+        }
+
+        public static Quaternion[] GetRelativeRotations(Transform[] transforms, Transform parent)
+        {
+            List<Quaternion> rotations = new List<Quaternion>();
+
+            for (int i = 0; i < transforms.Length; i++)
+            {
+                rotations.Add(Quaternion.Inverse(transforms[i].rotation) * parent.rotation);
+            }
+
+            return rotations.ToArray();
+        }
+
+        public static Transform GetClosestTransform(Transform[] tsfs, Vector3 point)
+        {
+            float d;
+            float minDistance = Mathf.Infinity;
+            Transform candidate = null;
+
+            for (int i = 0; i < tsfs.Length; i++)
+            {
+                d = Vector3.Distance(tsfs[i].position, point);
+                if (d < minDistance)
+                {
+                    minDistance = d;
+                    candidate = tsfs[i];
+                }
+            }
+
+            return candidate;
+        }
+
+        public static T FindHandler<T>(HPTKHandler[] handlers) where T : HPTKHandler
+        {
+            for (int i = 0; i < handlers.Length; i++)
+            {
+                if (handlers[i] is T)
+                    return handlers[i] as T;
+            }
+
+            return null;
+        }
+
+        public static T FindScriptableObject<T>(ScriptableObject[] scriptableObjects) where T : ScriptableObject
+        {
+            for (int i = 0; i < scriptableObjects.Length; i++)
+            {
+                if (scriptableObjects[i] is T)
+                    return scriptableObjects[i] as T;
+            }
+
+            return null;
+        }
+
+        public static Quaternion ClampQuaternion(Quaternion origin, Quaternion destination, float maxAngle)
+        {
+            float angle = Quaternion.Angle(origin, destination);
+
+            float lerp = Mathf.Clamp(angle, 0.0f, maxAngle);
+
+            return Quaternion.Lerp(origin, destination, lerp);
         }
     }
 }

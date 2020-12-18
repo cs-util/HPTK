@@ -1,4 +1,5 @@
 ﻿using HPTK.Input;
+using HPTK.Settings;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,38 +11,55 @@ namespace HPTK.Models.Avatar
     {
         public ProxyHandModel proxyHand;
 
+        public InputConfiguration configuration;
+
         public InputDataProvider inputDataProvider;
 
-        public bool updateBonesOnValidate = true;
+        public bool isActive = true;
+
+        [HideInInspector]
+        public MasterBoneModel[] bonesToUpdate;
+
+        [HideInInspector]
+        public float highestLinearSpeed = 1000.0f;
+        [HideInInspector]
+        public float highestAngularSpeed = 1000.0f;
 
         /*
-         * 0 - wrist
-         * 1 - forearm
-         * 
-         * 2 - thumb0
-         * 3 - thumb1
-         * 4 - thumb2
-         * 5 - thumb3
-         * 
-         * 6 - index1
-         * 7 - index2
-         * 8 - index3
-         * 
-         * 9 - middle1
-         * 10 - middle2
-         * 11 - middle3
-         * 
-         * 12 - ring1
-         * 13 - ring2
-         * 14 - ring3
-         * 
-         * 15 - pinky0
-         * 16 - pinky1
-         * 17 - pinky2
-         * 18 - pinky3
-         */
+        * 0 - wrist
+        * 1 - forearm
+        * 
+        * 2 - thumb0
+        * 3 - thumb1
+        * 4 - thumb2
+        * 5 - thumb3
+        * 
+        * 6 - index1
+        * 7 - index2
+        * 8 - index3
+        * 
+        * 9 - middle1
+        * 10 - middle2
+        * 11 - middle3
+        * 
+        * 12 - ring1
+        * 13 - ring2
+        * 14 - ring3
+        * 
+        * 15 - pinky0
+        * 16 - pinky1
+        * 17 - pinky2
+        * 18 - pinky3
+        * 
+        * 19 - thumbTip
+        * 20 - indexTip
+        * 21 - middleTip
+        * 22 - ringTip
+        * 23 - pinkyTip
+        */
 
         [Header("Master rig mapping")]
+        public bool updateBonesOnValidate = true;
         public MasterBoneModel wrist;
         public MasterBoneModel forearm;
         public MasterBoneModel thumb0;
@@ -62,8 +80,14 @@ namespace HPTK.Models.Avatar
         public MasterBoneModel pinky2;
         public MasterBoneModel pinky3;
 
-        [HideInInspector]
-        public MasterBoneModel[] bonesToUpdate;
+        [Header("Updated by Controller")]
+        public bool handIsTracked = false;
+        public bool fingersAreTracked = false;
+        public bool isPredicting = false;
+
+        // Noise reduction
+        public float[] wmaWeights; // Assuming that window size won't change
+        public AbstractTsf[][] boneRecords; // Assuming that bonesToUpdate and window size won't change. [boneToUpdate][record]
 
         public void OnValidate()
         {

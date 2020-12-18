@@ -48,7 +48,7 @@ namespace HPTK.Views.Notifiers
 
         protected virtual void OnTriggerEnter(Collider other)
         {
-            if (!ready || other.transform.IsChildOf(ignoreChildren))
+            if (!ready || (ignoreChildren && other.transform.IsChildOf(ignoreChildren)))
                 return;
 
             Rigidbody rb = other.attachedRigidbody;
@@ -65,17 +65,19 @@ namespace HPTK.Views.Notifiers
             }
         }
 
+        /*
         protected virtual void OnTriggerStay(Collider other)
         {
-            if (!ready || other.transform.IsChildOf(ignoreChildren))
+            if (!ready || (ignoreChildren && other.transform.IsChildOf(ignoreChildren)))
                 return;
 
             onStayCollider.Invoke(other);
         }
+        */
 
         protected virtual void OnTriggerExit(Collider other)
         {
-            if (!ready || other.transform.IsChildOf(ignoreChildren))
+            if (!ready || (ignoreChildren && other.transform.IsChildOf(ignoreChildren)))
                 return;
 
             Rigidbody rb = other.attachedRigidbody;

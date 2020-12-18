@@ -9,9 +9,15 @@ using UnityEngine;
 
 namespace HPTK.Controllers.Avatar
 {
-    public class AvatarController : HPTKElement
+    public class AvatarController : AvatarHandler
     {
         public AvatarModel model;
+
+        private void Awake()
+        {
+            model.handler = this;
+            viewModel = new AvatarViewModel(model);
+        }
 
         private void Start()
         {
@@ -20,7 +26,7 @@ namespace HPTK.Controllers.Avatar
 
         private void Update()
         {
-            if (model.followsCamera && core.model.trackedCamera)
+            if (model.followsCamera && core.model.trackedCamera && model.headSight)
             {
                 model.headSight.position = core.model.trackedCamera.position;
                 model.headSight.rotation = core.model.trackedCamera.rotation;

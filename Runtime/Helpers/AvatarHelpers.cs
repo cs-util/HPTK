@@ -1,4 +1,5 @@
 ﻿using HPTK.Models.Avatar;
+using HPTK.Views.Handlers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,11 +8,50 @@ using UnityEngine;
 
 namespace HPTK.Helpers
 {
-    public enum GestureType
+    public enum Side
+    {
+        None,
+        Left,
+        Right,
+        Both
+    }
+
+    public enum HumanFinger
+    {
+        None,
+        Thumb,
+        Index,
+        Middle,
+        Ring,
+        Pinky
+    }
+
+    public enum HumanFingerBone
     {
         None = 0,
-        Grasp = 1,
-        Pinch = 2,
+        Metacarpal = 1,
+        Proximal = 2,
+        Intermediate = 3,
+        Distal = 4,
+    }
+
+    public enum HandGesture
+    {
+        None,
+        IndexPinch,
+        FullPinch,
+        PrecisionGrip,
+        PowerGrip,
+        Custom
+    }
+
+    public enum HandRepresentation
+    {
+        None = 0,
+        Master = 1,
+        Slave = 2,
+        Ghost = 3,
+        Other = 4
     }
 
     public static class AvatarHelpers
@@ -20,20 +60,11 @@ namespace HPTK.Helpers
         {
             List<FingerModel> fingerList = new List<FingerModel>();
 
-            if (!hand.thumb || !hand.index)
-            {
-                Debug.LogError(hand.name + " is missing Index or Thumb fingers. Initialization failed!");
-                return;
-            }
-
-            fingerList.Add(hand.thumb);
-            fingerList.Add(hand.index);
+            if (hand.thumb) fingerList.Add(hand.thumb);
+            if (hand.index) fingerList.Add(hand.index);
             if (hand.middle) fingerList.Add(hand.middle);
-            else Debug.LogWarning(hand.name + " has no Middle finger");
             if (hand.ring) fingerList.Add(hand.ring);
-            else Debug.LogWarning(hand.name + " has no Ring finger");
             if (hand.pinky) fingerList.Add(hand.pinky);
-            else Debug.LogWarning(hand.name + " has no Pinky finger");
 
             hand.fingers = fingerList.ToArray();
 
@@ -260,6 +291,20 @@ namespace HPTK.Helpers
             to.ray = from.ray;
 
             to.skinnedMR = from.skinnedMR;
+        }
+
+        public static InteractorHandler GetFirstInteractor(ProxyHandModel proxyHand)
+        {
+            for (int i = 0; i < proxyHand.relatedHandlers.Count; i++)
+            {
+                if (proxyHand.relatedHandlers[i] is InteractorHandler)
+                {
+                    // Return the first Interactor found
+                    return proxyHand.relatedHandlers[i] as InteractorHandler;
+                }
+            }
+
+            return null;
         }
     }
 }

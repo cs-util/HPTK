@@ -5,11 +5,7 @@ using HPTK.Views.Notifiers;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using HPTK.Models.Avatar;
-
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+using static HPTK.Views.Handlers.ProxyHandHandler;
 
 namespace HPTK.Models.Avatar
 {
@@ -17,6 +13,9 @@ namespace HPTK.Models.Avatar
     {
         [HideInInspector]
         public ProxyHandModel proxyHand;
+
+        [HideInInspector]
+        public HandViewModel viewModel;
 
         [Header("Models")]
         public FingerModel thumb;
@@ -44,13 +43,18 @@ namespace HPTK.Models.Avatar
         [Header("Components")]
         public SkinnedMeshRenderer skinnedMR;
 
-        [Header("(Updated by controller)")]
+        [Header("Updated by Controller")]
         public float fistLerp;
         public bool isFist;
 
         public float graspLerp;
         public float graspSpeed;
         public bool isGrasping;
+        public float timeGrasping;
+        public float graspIntentionTime;
+        [Range(0.0f,1.0f)]
+        public float graspIntentionLerp;
+        public bool isIntentionallyGrasping;
 
         [HideInInspector]
         public Transform[] allTransforms;
@@ -60,37 +64,21 @@ namespace HPTK.Models.Avatar
 
         protected void Awake()
         {
-            Initialize();
-        }
-
-        public void Initialize()
-        {
             // Fingers
-            AvatarHelpers.HandModelInit(this);
+
+            if (fingers == null || fingers.Length == 0)
+            {
+                AvatarHelpers.HandModelInit(this);
+            }
 
             // Bones
+
             bones = AvatarHelpers.GetHandBones(this);
 
             // Transforms (depends on .bones)
+
             allTransforms = AvatarHelpers.GetAllTransforms(this);
+            
         }
     }
 }
-
-#if UNITY_EDITOR
-[CustomEditor(typeof(HandModel), true)]
-public class HandModelEditor : Editor
-{
-    public override void OnInspectorGUI()
-    {
-        DrawDefaultInspector();
-
-        HandModel myScript = (HandModel)target;
-        if (GUILayout.Button("INITIALIZE"))
-        {
-            myScript.Initialize();
-        }
-    }
-}
-#endif
-
